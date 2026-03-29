@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, PLANS, type PlanKey } from "@/lib/stripe";
+import { getStripe, PLANS, type PlanKey } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
         { status: 503 }
       );
     }
+
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

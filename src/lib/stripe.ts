@@ -1,11 +1,22 @@
 // Stripe integration for JobMatch AI
-// Environment variables: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PRICE_PRO, NEXT_PUBLIC_STRIPE_PRICE_PREMIUM
+// Lazy initialization so it doesn't crash at build time without keys
 
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-03-25.dahlia",
-});
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY is not configured");
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: "2026-03-25.dahlia",
+    });
+  }
+  return _stripe;
+}
 
 export const PLANS: Record<
   string,
